@@ -10,7 +10,7 @@ const app = express();
 //--------------------------------MIDDLEWARE
 
 app.use(express.static('public'));
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 //-------------------------------CONFIGURATION VARIABLES
 const PORT = process.env.PORT || 3000;
@@ -24,6 +24,97 @@ app.get('/',  (req, res) => {
 });
 
 // Pokemon Routes
+
+
+// INDEX ROUTE
+app.get('/api/v1/pokemon', (req,res)=>{
+  db.Pokemon.find({},(error,pokemon)=>{
+    if(error){
+      res.json({
+        status: 400,
+        message: 'Something went wrong. Please try again.',
+        requestedAt: new Date().toLocaleString()
+      });
+    }
+    res.json({
+      status: 200,
+      data: pokemon,
+      requestedAt: new Date().toLocaleString()
+    })
+  });
+});
+
+// SHOW ROUTE
+app.get('/api/v1/pokemon/:id', (req,res)=>{
+  db.Pokemon.findById(req.params.id,(error,foundPokemon)=>{
+    if(error){
+      res.json({
+        status: 400,
+        message: 'Something went wrong. Please try again.',
+        requestedAt: new Date().toLocaleString()
+      });
+    }
+    res.json({
+      status: 200,
+      data: foundPokemon,
+      requestedAt: new Date().toLocaleString()
+    })
+  });
+});
+
+// CREATE ROUTE
+app.post('/api/v1/pokemon', (req,res)=>{
+  db.Pokemon.create(req.body,(error,createdPokemon)=>{
+    if(error){
+      res.json({
+        status: 400,
+        message: 'Something went wrong. Please try again.',
+        requestedAt: new Date().toLocaleString()
+      });
+    }
+    res.json({
+      status: 200,
+      data: createdPokemon,
+      requestedAt: new Date().toLocaleString()
+    })
+  });
+});
+
+// UPDATE ROUTE
+app.put('/api/v1/pokemon/:id', (req,res)=>{
+  db.Pokemon.findByIdAndUpdate(req.params.id,req.body,{new:true},(error,updatedPokemon)=>{
+    if(error){
+      res.json({
+        status: 400,
+        message: 'Something went wrong. Please try again.',
+        requestedAt: new Date().toLocaleString()
+      });
+    }
+    res.json({
+      status: 200,
+      data: updatedPokemon,
+      requestedAt: new Date().toLocaleString()
+    })
+  });
+});
+
+// DELETE ROUTE
+app.delete('/api/v1/pokemon/:id', (req,res)=>{
+  db.Pokemon.findByIdAndDelete(req.params.id,(error,deletedPokemon)=>{
+    if(error){
+      res.json({
+        status: 400,
+        message: 'Something went wrong. Please try again.',
+        requestedAt: new Date().toLocaleString()
+      });
+    }
+    res.json({
+      status: 200,
+      data: deletedPokemon,
+      requestedAt: new Date().toLocaleString()
+    })
+  });
+});
 
 // Trainer Routes
 
