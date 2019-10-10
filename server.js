@@ -23,12 +23,28 @@ app.get('/',  (req, res) => {
   res.sendFile('views/index.html' , { root : __dirname});
 });
 
-// Pokemon Routes
+// Base API Routes
 
+app.get('/api/v1', (req,res)=>{
+  res.json({
+    status:200,
+    message: 'Welcome to the Pokedex Api.',
+    endpoints:[
+      {
+        method: 'GET',
+        path: '/api/v1',
+        description: 'Describes all available endpoints.'
+      }
+  ],
+    requestedAt: new Date().toLocaleString()
+  })
+});
+
+// Pokemon Routes
 
 // INDEX ROUTE
 app.get('/api/v1/pokemon', (req,res)=>{
-  db.Pokemon.find({},(error,pokemon)=>{
+  db.Pokemon.find({},(error,foundPokemon)=>{
     if(error){
       res.json({
         status: 400,
@@ -38,7 +54,7 @@ app.get('/api/v1/pokemon', (req,res)=>{
     }
     res.json({
       status: 200,
-      data: pokemon,
+      data: foundPokemon,
       requestedAt: new Date().toLocaleString()
     })
   });
@@ -117,6 +133,102 @@ app.delete('/api/v1/pokemon/:id', (req,res)=>{
 });
 
 // Trainer Routes
+
+// INDEX ROUTE
+app.get('/api/v1/trainers', (req,res)=>{
+  db.Trainer
+    .find({})
+    .populate('pokemon')
+    .exec((error,foundTrainers)=>{
+    if(error){
+      res.json({
+        status: 400,
+        message: 'Something went wrong. Please try again.',
+        requestedAt: new Date().toLocaleString()
+      });
+    }
+    res.json({
+      status: 200,
+      data: foundTrainers,
+      requestedAt: new Date().toLocaleString()
+    });
+  });
+});
+
+// SHOW ROUTE
+app.get('/api/v1/trainers/:id', (req,res)=>{
+  db.Trainer
+    .findById(req.params.id)
+    .populate('pokemon')
+    .exec((error,foundTrainer)=>{
+    if(error){
+      res.json({
+        status: 400,
+        message: 'Something went wrong. Please try again.',
+        requestedAt: new Date().toLocaleString()
+      });
+    }
+    res.json({
+      status: 200,
+      data: foundTrainer,
+      requestedAt: new Date().toLocaleString()
+    })
+  })
+});
+
+// CREATE ROUTE
+app.post('/api/v1/trainers', (req,res)=>{
+  db.Trainer.create(req.body, (error,createdTrainer)=>{
+    if(error){
+      res.json({
+        status: 400,
+        message: 'Something went wrong. Please try again.',
+        requestedAt: new Date().toLocaleString()
+      });
+    }
+    res.json({
+      status: 200,
+      data: createdTrainer,
+      requestedAt: new Date().toLocaleString()
+    })
+  })
+});
+
+// UPDATE ROUTE
+app.put('/api/v1/trainers/:id', (req,res)=>{
+  db.Trainer.findByIdAndUpdate(req.params.id,req.body,{new:true},(error,updatedTrainer)=>{
+    if(error){
+      res.json({
+        status: 400,
+        message: 'Something went wrong. Please try again.',
+        requestedAt: new Date().toLocaleString()
+      });
+    }
+    res.json({
+      status: 200,
+      data: updatedTrainer,
+      requestedAt: new Date().toLocaleString()
+    })
+  });
+});
+
+// DELETE ROUTE
+app.delete('/api/v1/trainers/:id', (req,res)=>{
+  db.Pokemon.findByIdAndDelete(req.params.id,(error,deletedTrainer)=>{
+    if(error){
+      res.json({
+        status: 400,
+        message: 'Something went wrong. Please try again.',
+        requestedAt: new Date().toLocaleString()
+      });
+    }
+    res.json({
+      status: 200,
+      data: deletedTrainer,
+      requestedAt: new Date().toLocaleString()
+    })
+  });
+});
 
 // ------------------------------Start Server
 app.listen(PORT, () => console.log(`Listening at http://localhost:${PORT}/`));
