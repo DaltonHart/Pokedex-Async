@@ -4,8 +4,6 @@ const Schema = mongoose.Schema;
 
 const BadgeSchema = new Schema({
 	name: String,
-	town: String,
-	color: String,
 	gym: String
 });
 

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-// const Badge = require('./Badge');
+const Badge = require('./Badge');
 
 const TrainerSchema = new Schema({
 	name: String,
@@ -14,7 +14,7 @@ const TrainerSchema = new Schema({
 		}
 	],
 	// Embeded
-	// badges: [Badge.schema]
+	badges: [Badge.schema]
 });
 
 const Trainer = mongoose.model('Trainer', TrainerSchema);
