@@ -228,9 +228,11 @@ app.put('/api/v1/trainers/:id', (req,res)=>{
     if(req.body.name){
       foundTrainer.name = req.body.name;
     }
+    
     if(req.body.age){
       foundTrainer.age = req.body.age;
     }
+
     if(req.body.hometown){
       foundTrainer.hometown = req.body.hometown;
     }
