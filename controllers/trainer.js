@@ -6,7 +6,7 @@ module.exports = {
       const foundTrainers = await db.Trainer.find({}).populate('pokemon')
       res.success(200,foundTrainers);
     } catch (error) {
-      res.error(error);
+      res.error(error.message);
     }
   },
   show: async (req,res) => {
@@ -14,7 +14,7 @@ module.exports = {
       const foundTrainer = await db.Trainer.findById(req.params.id).populate('pokemon');
       res.success(200,foundTrainer);
     } catch(error) {
-        res.error(error);
+        res.error(error.message);
       }
   },
   create: async (req,res) => {
@@ -22,7 +22,7 @@ module.exports = {
       const createdTrainer = await db.Trainer.create(req.body);
       res.success(200, createdTrainer);
     } catch (error) {
-      res.error(error);
+      res.error(error.message);
     }
   },
   update: async (req,res) => {
@@ -57,7 +57,7 @@ module.exports = {
       res.success(200,updatedTrainer);
   
     } catch (error) {
-        res.error(error);
+        res.error(error.message);
     } 
   },
   delete: async (req,res) => {
@@ -65,7 +65,7 @@ module.exports = {
       const deletedTrainer = await db.Pokemon.findByIdAndDelete(req.params.id);
       res.success(200,deletedTrainer);
     } catch (error) {
-      res.error(error);
+      res.error(error.message);
     }
   },
   filterByBadge: async (req,res) => {
@@ -73,7 +73,7 @@ module.exports = {
       const foundTrainers = await db.Trainer.find({badges: {$elemMatch : {name: req.params.name}}});
       res.success(200, foundTrainers);
     } catch (error) {
-      res.error(error);
+      res.error(error.message);
     }
   }
 }
