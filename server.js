@@ -3,7 +3,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 // internal modules
-const db = require("./models");
+const compactRes = require("./middleware/response");
+const ctlr = require('./controllers');
 // instanced module
 const app = express();
 
@@ -11,6 +12,7 @@ const app = express();
 
 app.use(express.static('public'));
 app.use(bodyParser.json());
+app.use(compactRes);
 
 //-------------------------------CONFIGURATION VARIABLES
 const PORT = process.env.PORT || 3000;
@@ -43,268 +45,46 @@ app.get('/api/v1', (req,res)=>{
 // Pokemon Routes
 
 // INDEX ROUTE
-app.get('/api/v1/pokemon', (req,res)=>{
-  db.Pokemon.find({},(error,foundPokemon)=>{
-    if(error){
-      res.json({
-        status: 400,
-        message: 'Something went wrong. Please try again.',
-        requestedAt: new Date().toLocaleString()
-      });
-    }
-    res.json({
-      status: 200,
-      data: foundPokemon,
-      requestedAt: new Date().toLocaleString()
-    })
-  });
-});
+app.get('/api/v1/pokemon', ctlr.pokemon.index);
 
 // SHOW ROUTE
-app.get('/api/v1/pokemon/:name', (req,res)=>{
-  db.Pokemon.find({name: req.params.name},(error,foundPokemon)=>{
-    if(error){
-      res.json({
-        status: 400,
-        message: 'Something went wrong. Please try again.',
-        requestedAt: new Date().toLocaleString()
-      });
-    }
-    res.json({
-      status: 200,
-      data: foundPokemon,
-      requestedAt: new Date().toLocaleString()
-    })
-  });
-});
+app.get('/api/v1/pokemon/:name', ctlr.pokemon.show);
 
 // CREATE ROUTE
-app.post('/api/v1/pokemon', (req,res)=>{
-  db.Pokemon.create(req.body,(error,createdPokemon)=>{
-    if(error){
-      res.json({
-        status: 400,
-        message: 'Something went wrong. Please try again.',
-        requestedAt: new Date().toLocaleString()
-      });
-    }
-    res.json({
-      status: 201,
-      data: createdPokemon,
-      requestedAt: new Date().toLocaleString()
-    })
-  });
-});
+app.post('/api/v1/pokemon', ctlr.pokemon.create);
 
 // UPDATE ROUTE
-app.put('/api/v1/pokemon/:id', (req,res)=>{
-  db.Pokemon.findByIdAndUpdate(req.params.id,req.body,{new:true},(error,updatedPokemon)=>{
-    if(error){
-      res.json({
-        status: 400,
-        message: 'Something went wrong. Please try again.',
-        requestedAt: new Date().toLocaleString()
-      });
-    }
-    res.json({
-      status: 200,
-      data: updatedPokemon,
-      requestedAt: new Date().toLocaleString()
-    })
-  });
-});
+app.put('/api/v1/pokemon/:id', ctlr.pokemon.update);
 
 // DELETE ROUTE
-app.delete('/api/v1/pokemon/:id', (req,res)=>{
-  db.Pokemon.findByIdAndDelete(req.params.id,(error,deletedPokemon)=>{
-    if(error){
-      res.json({
-        status: 400,
-        message: 'Something went wrong. Please try again.',
-        requestedAt: new Date().toLocaleString()
-      });
-    }
-    res.json({
-      status: 200,
-      data: deletedPokemon,
-      requestedAt: new Date().toLocaleString()
-    })
-  });
-});
+app.delete('/api/v1/pokemon/:id', ctlr.pokemon.delete);
 
 //TODO get all trainers that have a specific Pokemon
 
-app.get('/api/v1/pokemon/:name/trainers', (req,res)=>{
-  db.Pokemon.find({name: req.params.name}, (error, foundPokemon)=>{
-    db.Trainer
-      .find({pokemon: {$eq:foundPokemon}})
-      .populate("pokemon")
-      .exec((error,foundTrainer)=>{
-      if(error){
-        return res.json({
-          status: 400,
-          message: 'Something went wrong. Please try again.',
-          error,
-          requestedAt: new Date().toLocaleString()
-        });
-      }
-      res.json({
-        status: 200,
-        data: foundTrainer,
-        requestedAt: new Date().toLocaleString()
-      })
-    })
-  })
-});
-
+app.get('/api/v1/pokemon/:name/trainers', ctlr.pokemon.filterTrainers);
 
 // Trainer Routes
 
 // INDEX ROUTE
-app.get('/api/v1/trainers', (req,res)=>{
-  db.Trainer
-    .find({})
-    .populate('pokemon')
-    .exec((error,foundTrainers)=>{
-    if(error){
-      res.json({
-        status: 400,
-        message: 'Something went wrong. Please try again.',
-        requestedAt: new Date().toLocaleString()
-      });
-    }
-    res.json({
-      status: 200,
-      data: foundTrainers,
-      requestedAt: new Date().toLocaleString()
-    });
-  });
-});
+app.get('/api/v1/trainers', ctlr.trainer.index);
 
 // SHOW ROUTE
-app.get('/api/v1/trainers/:id', (req,res)=>{
-  db.Trainer
-    .findById(req.params.id)
-    .populate('pokemon')
-    .exec((error,foundTrainer)=>{
-    if(error){
-      res.json({
-        status: 400,
-        message: 'Something went wrong. Please try again.',
-        requestedAt: new Date().toLocaleString()
-      });
-    }
-    res.json({
-      status: 200,
-      data: foundTrainer,
-      requestedAt: new Date().toLocaleString()
-    })
-  })
-});
+app.get('/api/v1/trainers/:id', ctlr.trainer.show);
 
 // CREATE ROUTE
-app.post('/api/v1/trainers', (req,res)=>{
-  db.Trainer.create(req.body, (error,createdTrainer)=>{
-    if(error){
-      res.json({
-        status: 400,
-        message: 'Something went wrong. Please try again.',
-        requestedAt: new Date().toLocaleString()
-      });
-    }
-    res.json({
-      status: 200,
-      data: createdTrainer,
-      requestedAt: new Date().toLocaleString()
-    })
-  })
-});
+app.post('/api/v1/trainers', ctlr.trainer.create);
 
 // UPDATE ROUTE
 // TODO update to reflect dynamic changes
-app.put('/api/v1/trainers/:id', (req,res)=>{
-  db.Trainer.findById(req.params.id,(error,foundTrainer)=>{
-
-    if(req.body.name){
-      foundTrainer.name = req.body.name;
-    }
-    
-    if(req.body.age){
-      foundTrainer.age = req.body.age;
-    }
-
-    if(req.body.hometown){
-      foundTrainer.hometown = req.body.hometown;
-    }
-
-    if(req.body.pokemon){
-      req.body.pokemon.forEach(entry =>{
-        foundTrainer.pokemon.push(entry);
-      });
-    }
-
-    if(req.body.badges){
-      req.body.badges.forEach(entry =>{
-        foundTrainer.badges.push(entry);
-      });
-    }
-
-    foundTrainer.save((error, updatedTrainer)=>{
-      if(error){
-        res.json({
-          status: 400,
-          message: 'Something went wrong. Please try again.',
-          error,
-          requestedAt: new Date().toLocaleString()
-        });
-      }
-      res.json({
-        status: 200,
-        data: updatedTrainer,
-        requestedAt: new Date().toLocaleString()
-      })
-    })
-  });
-});
+app.put('/api/v1/trainers/:id', ctlr.trainer.update);
 
 // DELETE ROUTE
-app.delete('/api/v1/trainers/:id', (req,res)=>{
-  db.Pokemon.findByIdAndDelete(req.params.id,(error,deletedTrainer)=>{
-    if(error){
-      res.json({
-        status: 400,
-        message: 'Something went wrong. Please try again.',
-        requestedAt: new Date().toLocaleString()
-      });
-    }
-    res.json({
-      status: 200,
-      data: deletedTrainer,
-      requestedAt: new Date().toLocaleString()
-    })
-  });
-});
+app.delete('/api/v1/trainers/:id', ctlr.trainer.delete);
 
 
 //TODO get all trainers that have a specific Badge
 
-app.get('/api/v1/badges/:name/trainers', (req,res)=>{
-  db.Trainer.find({badges: {$elemMatch : {name: req.params.name}}}, (error, foundTrainers)=>{
-    if(error){
-      return res.json({
-        status: 400,
-        message: 'Something went wrong. Please try again.',
-        requestedAt: new Date().toLocaleString()
-      });
-    }
-    res.json({
-      status: 200,
-      count: foundTrainers.length,
-      data: foundTrainers,
-      requestedAt: new Date().toLocaleString()
-    })
-  });
-});
+app.get('/api/v1/badges/:name/trainers', ctlr.trainer.filterByBadge);
 
 
 // ------------------------------Start Server
