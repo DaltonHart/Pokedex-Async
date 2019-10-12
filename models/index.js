@@ -10,4 +10,7 @@ mongoose.connect(DB_URL, {
   .then(() => console.log('MongoDB connected...'))
   .catch((err) => console.log(err));
 
-module.exports = {};
+  module.exports = {
+    Pokemon: require('./Pokemon'),
+    Trainer: require('./Trainer')
+  };
